@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: safeno
+
+  h2:
+    console:
+      enabled: true
+
+  #https://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/ConfigJDBCJobStoreClustering.html
+  quartz:
+    scheduler-name: safeno
+    job-store-type: jdbc
+    jdbc:
+      # ?? ???? ???.
+      # always? ??? ???? ? ??? ?????.
+      # org.quartz.impl.jdbcjobstore? ????? ?????. mysql? ?? tables_mysql_innodb.sql? ?????? ???
+      initialize-schema: never
+    wait-for-jobs-to-complete-on-shutdown: true
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO
+          jobStore:
+            isClustered: true        # ????? ???
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+
+  datasource:
+#    url: jdbc:h2:mem:test
+    url: jdbc:mysql://localhost:3306/safeno
+    username: root
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+#    defer-datasource-initialization: true
+#
+#  sql:
+#    init:
+#      mode: embedded
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.resource.transaction: DEBUG
+#    org.springframework:
+#      transaction: TRACE
+#      jdbc.datasource.DataSourceTransactionManager: DEBUG
+#      orm.jpa: TRACE
+
