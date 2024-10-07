@@ -24,6 +24,7 @@ spring:
           jobStore:
             isClustered: true        # ????? ???
             driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            useProperties: true # JobData? ??? ?? ? ?? ??? ??
 
   datasource:
 #    url: jdbc:h2:mem:test
