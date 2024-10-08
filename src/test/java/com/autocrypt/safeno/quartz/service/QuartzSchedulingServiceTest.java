@@ -20,6 +20,7 @@ class QuartzSchedulingServiceTest {
 
     @Test
     public void registerSimpleJob(){
+
         try {
             Date date = quartzSchedulingService.scheduleOneTimeJob("sample-simple2", "samples", SampleJob.class, ZonedDateTime.now().plusSeconds(10), Map.of("username", "daeho", "time", "10sec"));
             System.out.println("simple job start at : " + date);

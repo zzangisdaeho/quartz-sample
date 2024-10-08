@@ -11,9 +11,6 @@ spring:
     scheduler-name: safeno
     job-store-type: jdbc
     jdbc:
-      # ?? ???? ???.
-      # always? ??? ???? ? ??? ?????.
-      # org.quartz.impl.jdbcjobstore? ????? ?????. mysql? ?? tables_mysql_innodb.sql? ?????? ???
       initialize-schema: never
     wait-for-jobs-to-complete-on-shutdown: true
     properties:
@@ -22,9 +19,9 @@ spring:
           scheduler:
             instanceId: AUTO
           jobStore:
-            isClustered: true        # ????? ???
+            isClustered: true
             driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-            useProperties: true # JobData? ??? ?? ? ?? ??? ??
+            useProperties: true
 
   datasource:
 #    url: jdbc:h2:mem:test
