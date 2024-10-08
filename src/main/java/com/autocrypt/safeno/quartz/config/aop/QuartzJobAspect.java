@@ -1,6 +1,5 @@
 package com.autocrypt.safeno.quartz.config.aop;
 
-import com.autocrypt.safeno.quartz.config.annotation.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,12 +8,14 @@ import org.aspectj.lang.annotation.Before;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(value = "quartz.enabled", havingValue = "true")
 public class QuartzJobAspect {
 
     private final Scheduler scheduler;

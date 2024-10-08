@@ -1,15 +1,29 @@
 package com.autocrypt.safeno.quartz.jobs;
 
 import com.autocrypt.logtracer.trace.annotation.LogTrace;
+import com.autocrypt.safeno.safeno.config.SafenoProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.core.env.Environment;
 
 @Slf4j
 @LogTrace
-public class SampleJob implements Job {
+public class SampleSimpleJob implements Job {
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private ApplicationArguments applicationArguments;
+
+    @Autowired
+    private SafenoProperties safenoProperties;
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
@@ -21,5 +35,13 @@ public class SampleJob implements Job {
 
         // 실제로 스케줄링할 작업 로직을 여기서 처리
         log.info("Sample Job is being executed...");
+
+        try {
+            // Job 실행 중 발생할 수 있는 예외
+            throw new RuntimeException("Job failed due to some issue");
+        } catch (Exception e) {
+            // Job 실패를 JobExecutionException으로 감싸서 처리
+            throw new JobExecutionException(e);
+        }
     }
 }

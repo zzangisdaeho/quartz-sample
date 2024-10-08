@@ -1,3 +1,6 @@
+quartz.enabled: true
+#quartz.enabled: false
+
 spring:
   application:
     name: safeno
@@ -40,6 +43,23 @@ spring:
 #  sql:
 #    init:
 #      mode: embedded
+
+safeno:
+  delete-time: 7d #duration
+  provider:
+    skt:
+      delete-time: 3d
+    kt:
+      delete-time: 4d
+    lg:
+      delete-time: 5d
+  service:
+    taboso:
+      delete-time: 3d
+    move-free:
+      delete-time: 3d
+    imom:
+      delete-time: 3d
 
 logging:
   level:

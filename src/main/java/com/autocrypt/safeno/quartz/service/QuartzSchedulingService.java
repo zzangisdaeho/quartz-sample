@@ -5,6 +5,7 @@ import com.autocrypt.safeno.quartz.config.annotation.CheckQuartzJobNotExist;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -15,6 +16,7 @@ import java.util.TimeZone;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(value = "quartz.enabled", havingValue = "true")
 public class QuartzSchedulingService {
 
     private final Scheduler scheduler;

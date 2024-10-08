@@ -1,10 +1,14 @@
 package com.autocrypt.safeno.quartz.config.listener;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(value = "quartz.enabled", havingValue = "true")
+@Slf4j
 public class QuartzListenerConfig {
 
     private final Scheduler scheduler;
@@ -17,6 +21,7 @@ public class QuartzListenerConfig {
     public void addJobListener() {
         try {
             scheduler.getListenerManager().addJobListener(new JobHistoryListener());
+            log.info("JobHistoryListener added");
         } catch (SchedulerException e) {
             throw new RuntimeException("Failed to add Job Listener", e);
         }

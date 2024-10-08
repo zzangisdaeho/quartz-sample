@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("/api/scheduler")
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "quartz.enabled", havingValue = "true")
 public class QuartzController {
 
     private final QuartzSchedulingService quartzSchedulingService;
