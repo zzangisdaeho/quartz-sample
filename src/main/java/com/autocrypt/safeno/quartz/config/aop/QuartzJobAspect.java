@@ -1,5 +1,6 @@
 package com.autocrypt.safeno.quartz.config.aop;
 
+import com.autocrypt.logtracer.trace.annotation.LogTrace;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 @ConditionalOnProperty(value = "quartz.enabled", havingValue = "true")
+@LogTrace
 public class QuartzJobAspect {
 
     private final Scheduler scheduler;

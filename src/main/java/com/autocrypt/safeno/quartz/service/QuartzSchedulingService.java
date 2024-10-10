@@ -2,6 +2,7 @@ package com.autocrypt.safeno.quartz.service;
 
 import com.autocrypt.safeno.quartz.config.annotation.CheckQuartzJobExist;
 import com.autocrypt.safeno.quartz.config.annotation.CheckQuartzJobNotExist;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -23,7 +24,7 @@ public class QuartzSchedulingService {
 
     // 1. 스케줄 등록 (Create) - CRON Job
     @CheckQuartzJobExist
-    public Date scheduleCronJob(String jobName, String jobGroup, Class<? extends Job> jobClass, ZonedDateTime startAt, String cronExpression, Map<String, Object> jobParams) throws SchedulerException {
+    public Date scheduleCronJob(String jobName, String jobGroup, Class<? extends Job> jobClass, ZonedDateTime startAt, String cronExpression, @Nullable Map<String, Object> jobParams) throws SchedulerException {
         JobDetail jobDetail = getJobDetail(jobName, jobGroup, jobClass, jobParams);
 
         CronTrigger cronTrigger = TriggerBuilder.newTrigger()
@@ -40,7 +41,7 @@ public class QuartzSchedulingService {
 
     // 2. 스케줄 등록 (특정 시간에 한 번만 실행) - SimpleTrigger
     @CheckQuartzJobExist
-    public Date scheduleOneTimeJob(String jobName, String jobGroup, Class<? extends Job> jobClass, ZonedDateTime startAt, Map<String, Object> jobParams) throws SchedulerException {
+    public Date scheduleOneTimeJob(String jobName, String jobGroup, Class<? extends Job> jobClass, ZonedDateTime startAt, @Nullable Map<String, Object> jobParams) throws SchedulerException {
         JobDetail jobDetail = getJobDetail(jobName, jobGroup, jobClass, jobParams);
 
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
@@ -57,11 +58,11 @@ public class QuartzSchedulingService {
 
     // 3. 스케줄 수정 (Update) - CRON Job 수정
     @CheckQuartzJobNotExist
-    public Date updateCronJobSchedule(String jobName, String jobGroup, Date newStartAt, String newCronExpression) throws SchedulerException {
+    public Date updateCronJobSchedule(String jobName, String jobGroup, ZonedDateTime newStartAt, String newCronExpression) throws SchedulerException {
         TriggerKey triggerKey = new TriggerKey(jobName + "Trigger", jobGroup);
         CronTrigger newTrigger = TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)
-                .startAt(newStartAt)
+                .startAt(Date.from(newStartAt.toInstant()))
                 .withSchedule(CronScheduleBuilder.cronSchedule(newCronExpression))
                 .build();
 
@@ -72,12 +73,12 @@ public class QuartzSchedulingService {
 
     // 4. 스케줄 수정 (Update) - SimpleTrigger 수정
     @CheckQuartzJobNotExist
-    public Date updateSimpleTriggerJob(String jobName, String jobGroup, Date newStartAt) throws SchedulerException {
+    public Date updateSimpleTriggerJob(String jobName, String jobGroup, ZonedDateTime newStartAt) throws SchedulerException {
         TriggerKey triggerKey = new TriggerKey(jobName + "Trigger", jobGroup);
 
         SimpleTrigger newTrigger = TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)
-                .startAt(newStartAt)  // 새로운 실행 시간 설정
+                .startAt(Date.from(newStartAt.toInstant())) // 새로운 실행 시간 설정
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule())
                 .build();
 
@@ -117,7 +118,7 @@ public class QuartzSchedulingService {
     private static JobDetail getJobDetail(String jobName, String jobGroup, Class<? extends Job> jobClass, Map<String, Object> jobParams) {
         return JobBuilder.newJob(jobClass)
                 .withIdentity(jobName, jobGroup)
-                .setJobData(new JobDataMap(jobParams))
+                .setJobData(jobParams != null? new JobDataMap(jobParams) : new JobDataMap())
                 .build();
     }
 }

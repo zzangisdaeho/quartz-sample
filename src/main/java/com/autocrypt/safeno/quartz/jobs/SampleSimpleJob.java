@@ -35,13 +35,5 @@ public class SampleSimpleJob implements Job {
 
         // 실제로 스케줄링할 작업 로직을 여기서 처리
         log.info("Sample Job is being executed...");
-
-        try {
-            // Job 실행 중 발생할 수 있는 예외
-            throw new RuntimeException("Job failed due to some issue");
-        } catch (Exception e) {
-            // Job 실패를 JobExecutionException으로 감싸서 처리
-            throw new JobExecutionException(e);
-        }
     }
 }
