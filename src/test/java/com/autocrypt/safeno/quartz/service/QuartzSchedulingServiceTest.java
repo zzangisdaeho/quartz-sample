@@ -42,7 +42,15 @@ class QuartzSchedulingServiceTest {
     @Test
     public void registerSimpleJobByEvent(){
 
-        applicationEventPublisher.publishEvent(new QuartzSchedulingEventListener.QuartzJobEventDTO("sample-simple3", "samples", SampleSimpleJob.class, ZonedDateTime.now().plusSeconds(10), null, null, QuartzSchedulingEventListener.QuartzJobEventDTO.QuartzJobEventType.CREATE, QuartzSchedulingEventListener.QuartzJobEventDTO.QuartzJobType.SIMPLE));
+        applicationEventPublisher.publishEvent(
+                QuartzSchedulingEventListener.QuartzJobCreateEvent.builder()
+                        .startAt(ZonedDateTime.now().plusSeconds(10))
+                        .jobName("testJob1")
+                        .jobGroup("testGroup")
+                        .jobClass(SampleSimpleJob.class)
+                        .build()
+
+        );
     }
 
     @Test

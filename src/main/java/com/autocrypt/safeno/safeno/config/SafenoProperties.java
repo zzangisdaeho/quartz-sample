@@ -28,9 +28,11 @@ public class SafenoProperties {
     @ToString
     public static class Provider {
         private final Duration deleteTime;
+        private final String domain;
 
-        public Provider(Duration deleteTime) {
+        public Provider(Duration deleteTime, String domain) {
             this.deleteTime = deleteTime;
+            this.domain = domain;
         }
     }
 
@@ -38,9 +40,11 @@ public class SafenoProperties {
     @ToString
     public static class Service {
         private final Duration deleteTime;
+        private final ProviderEnum provider;
 
-        public Service(Duration deleteTime) {
+        public Service(Duration deleteTime, ProviderEnum provider) {
             this.deleteTime = deleteTime;
+            this.provider = provider;
         }
     }
 

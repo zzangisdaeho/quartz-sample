@@ -1,4 +1,7 @@
-quartz.enabled: true
+quartz:
+  enabled: true
+test:
+  error: true
 #quartz.enabled: false
 
 spring:
@@ -48,18 +51,24 @@ safeno:
   delete-time: 7d #duration
   provider:
     skt:
+      domain: https://safen.skbroadband.com:36361
       delete-time: 3d
     kt:
+      domain: unkown
       delete-time: 4d
     lg:
+      domain: unkown
       delete-time: 5d
   service:
     taboso:
       delete-time: 3d
+      provider: skt
     move-free:
       delete-time: 3d
+      provider: kt
     imom:
       delete-time: 3d
+      provider: lg
 
 logging:
   level:
