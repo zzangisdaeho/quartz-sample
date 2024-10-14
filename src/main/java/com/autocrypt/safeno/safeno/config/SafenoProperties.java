@@ -1,5 +1,6 @@
 package com.autocrypt.safeno.safeno.config;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,10 +30,12 @@ public class SafenoProperties {
     public static class Provider {
         private final Duration deleteTime;
         private final String domain;
+        private final Map<String, String> details;
 
-        public Provider(Duration deleteTime, String domain) {
+        public Provider(Duration deleteTime, String domain, Map<String, String> details) {
             this.deleteTime = deleteTime;
             this.domain = domain;
+            this.details = details;
         }
     }
 
@@ -53,6 +56,11 @@ public class SafenoProperties {
     }
 
     public enum ServiceEnum {
-        TABOSO, MOVE_FREE, IMOM
+        TABOSO, MOVE_FREE, IMOM, KCALL;
+
+        @JsonCreator
+        public static ServiceEnum from(String value) {
+            return ServiceEnum.valueOf(value.toUpperCase());
+        }
     }
 }

@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequiredArgsConstructor
-public class SafenoController {
+public class TestController {
 
     private final SafenoProperties safenoProperties;
 

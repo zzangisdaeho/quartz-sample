@@ -1,0 +1,8 @@
+spring:
+  config:
+    import:
+      - classpath:properties/qa/datasource.yml
+      - classpath:properties/qa/jpa.yml
+      - classpath:properties/qa/logging.yml
+      - classpath:properties/qa/quartz.yml
+      - classpath:properties/qa/safeno.yml
