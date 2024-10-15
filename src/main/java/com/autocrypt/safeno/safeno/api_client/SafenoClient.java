@@ -1,11 +1,11 @@
 package com.autocrypt.safeno.safeno.api_client;
 
 import com.autocrypt.safeno.safeno.api_client.dto.SafenoClientRes;
-import jakarta.annotation.Nullable;
+import com.autocrypt.safeno.safeno.config.SafenoProperties;
 
 import java.util.Map;
 
-public interface SafeNoClient {
+public interface SafenoClient {
 
     // Create (생성) 메서드
     SafenoClientRes createSafeNo(String telNo,
@@ -29,4 +29,6 @@ public interface SafeNoClient {
                                  Map<String, Object> requestParams,
                                  Map<String, Object> headers);
 
+    // 각 클라이언트가 자신에 맞는 ProviderEnum을 반환하도록 하는 메서드
+    SafenoProperties.ProviderEnum getProvider();
 }

@@ -10,6 +10,7 @@ import com.autocrypt.safeno.safeno.controller.dto.res.UpdateExpiredDateRes;
 import com.autocrypt.safeno.safeno.service.SafeNoService;
 import com.autocrypt.safeno.safeno.util.SafeNoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -23,8 +24,8 @@ public class SafeNoController {
 
     @PostMapping("/{telNo}")
     public ResponseEntity<CreateSafeNoRes> createSafeNo(
-        @PathVariable("telNo") String telNo, 
-        @RequestBody CreateSafeNoReq req) {
+        @PathVariable("telNo") String telNo,
+        @RequestBody @Validated CreateSafeNoReq req) {
         CreateSafeNoRes response = safeNoService.createSafeNo(SafeNoUtil.getTelNoNumberOnly(telNo), req);
         return ResponseEntity.ok(null);
     }

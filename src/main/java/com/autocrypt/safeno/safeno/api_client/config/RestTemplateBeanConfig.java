@@ -1,4 +1,4 @@
-package com.autocrypt.safeno.safeno.api_client;
+package com.autocrypt.safeno.safeno.api_client.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

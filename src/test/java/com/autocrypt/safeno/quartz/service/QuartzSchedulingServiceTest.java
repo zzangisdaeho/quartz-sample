@@ -16,7 +16,6 @@ import java.util.Map;
 
 @SpringBootTest
 @TestPropertySource(properties = {
-        "log_trace=on",
         "quartz.enabled=true"
 })
 class QuartzSchedulingServiceTest {

@@ -1,9 +1,10 @@
-package com.autocrypt.safeno.safeno.config.exception;
+package com.autocrypt.safeno.safeno.api_client.exception;
 
+import com.autocrypt.safeno.safeno.config.exception.CustomException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-public class SKTSafenoError extends CustomException{
+public class SKTSafenoError extends CustomException {
 
     private final SKTSafenoErrorCode errorCode;
 
