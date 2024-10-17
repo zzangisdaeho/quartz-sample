@@ -1,4 +1,4 @@
-safeno:
+safe-no:
   delete-time: 7d #duration
   provider:
     skt:

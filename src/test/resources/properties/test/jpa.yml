@@ -6,3 +6,4 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+    show-sql: true

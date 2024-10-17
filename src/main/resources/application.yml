@@ -1,8 +1,8 @@
 server:
   servlet:
-    context-path: /safeno
+    context-path: /safe-no
 
 spring:
   application:
-    name: safeno
+    name: safeNo
 
