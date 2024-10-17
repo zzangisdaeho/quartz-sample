@@ -1,9 +1,10 @@
 package com.autocrypt.safe_no.safe_no.api_client;
 
 import com.autocrypt.logtracer.trace.annotation.LogTrace;
+import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientReq;
 import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientRes;
 import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
-import com.autocrypt.safe_no.safe_no.api_client.exception.SKTSafenoError;
+import com.autocrypt.safe_no.safe_no.api_client.exception.SKTSafeNoError;
 import com.autocrypt.safe_no.safe_no.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,18 +12,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component("sktSafeNoClient")
 @LogTrace
 @Slf4j
-public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
+public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientRequestMapper {
 
 
     private final RestTemplate restTemplate;
@@ -40,12 +44,12 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
     }
 
     @Override
-    public SafeNoClientRes createSafeNo(String telNo,
-                                        Map<String, Object> requestParams,
-                                        Map<String, Object> body,
-                                        Map<String, Object> headers) {
+    public SafeNoClientRes createSafeNoInternal(SafeNoClientReq req,
+                                                Map<String, Object> requestParams,
+                                                Map<String, Object> body,
+                                                Map<String, Object> headers) {
 
-        if(requestParams==null) requestParams = Collections.EMPTY_MAP;
+        if (requestParams == null) requestParams = Collections.EMPTY_MAP;
 
         // 기본 URL
         String baseUrl = provider.getDomain()
@@ -56,14 +60,13 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
                 .queryParam("group_code", provider.getDetails().getOrDefault("group-code", "autocrypt"))
                 .queryParam("customer_code", provider.getDetails().getOrDefault("customer-code", "1308"))
                 .queryParam("send_date", TimeUtil.formatZonedDateTime(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
-                .queryParam("tel_no", telNo)
+                .queryParam("tel_no", req.getTelNo())
                 .queryParam("new_flag", requestParams.getOrDefault("new_flag", "Y"))
                 .build()
                 .toUri();
 
-
-        // HTTP 호출 및 JSON 응답 받기
-        ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+        ResponseEntity<String> response = getStringResponseEntity(uri);
+        // HTTP 호출 JSON parsing
         String jsonResponse = response.getBody();
         JsonNode jsonNode = convertStringToJsonNode(jsonResponse);
         checkResponseCorrect(jsonNode, uri, null);
@@ -73,10 +76,24 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
 
     }
 
+    private ResponseEntity<String> getStringResponseEntity(URI uri) {
+        ResponseEntity<String> response;
+        try{
+            response = restTemplate.getForEntity(uri, String.class);
+        }catch (HttpClientErrorException e){
+            log.error("skt safeNo create fail by 400 status. {} ", e.getMessage(), e);
+            throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR.getMean(), SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR);
+        }catch (HttpServerErrorException e){
+            log.error("skt safeNo create fail by 500 status. {} ", e.getMessage(), e);
+            throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR.getMean(), SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR);
+        }
+        return response;
+    }
+
     @Override
-    public SafeNoClientRes readSafeNo(String safeNo,
-                                      Map<String, Object> requestParams,
-                                      Map<String, Object> headers) {
+    public SafeNoClientRes readSafeNoInternal(SafeNoClientReq req,
+                                              Map<String, Object> requestParams,
+                                              Map<String, Object> headers) {
 
         // 기본 URL
         String baseUrl = provider.getDomain()
@@ -87,13 +104,13 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
                 .queryParam("group_code", provider.getDetails().getOrDefault("group-code", "autocrypt"))
                 .queryParam("customer_code", provider.getDetails().getOrDefault("customer-code", "1308"))
                 .queryParam("send_date", TimeUtil.formatZonedDateTime(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
-                .queryParam("qry_no", safeNo)
+                .queryParam("qry_no", req.getSafeNo())
                 .queryParam("qry_flag", requestParams.getOrDefault("qry_flag", "S"))
                 .build()
                 .toUri();
 
         // HTTP 호출 및 JSON 응답 받기
-        ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+        ResponseEntity<String> response = getStringResponseEntity(uri);
         String jsonResponse = response.getBody();
         JsonNode jsonNode = convertStringToJsonNode(jsonResponse);
         checkResponseCorrect(jsonNode, uri, null);
@@ -103,18 +120,18 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
     }
 
     @Override
-    public SafeNoClientRes updateSafeNo(String telNo,
-                                        Map<String, Object> requestParams,
-                                        Map<String, Object> body,
-                                        Map<String, Object> headers) {
+    public SafeNoClientRes updateSafeNoInternal(SafeNoClientReq req,
+                                                Map<String, Object> requestParams,
+                                                Map<String, Object> body,
+                                                Map<String, Object> headers) {
         // SKT의 경우 Update 작업이 없을 수 있음, 필요 시 구현
         throw new UnsupportedOperationException("Update operation is not supported for SKT");
     }
 
     @Override
-    public SafeNoClientRes deleteSafeNo(String safeNo,
-                                        Map<String, Object> requestParams,
-                                        Map<String, Object> headers) {
+    public SafeNoClientRes deleteSafeNoInternal(SafeNoClientReq req,
+                                                Map<String, Object> requestParams,
+                                                Map<String, Object> headers) {
 
         // 기본 URL
         String baseUrl = provider.getDomain()
@@ -125,12 +142,12 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
                 .queryParam("group_code", provider.getDetails().getOrDefault("group-code", "autocrypt"))
                 .queryParam("customer_code", provider.getDetails().getOrDefault("customer-code", "1308"))
                 .queryParam("send_date", TimeUtil.formatZonedDateTime(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
-                .queryParam("safen_no", safeNo)
+                .queryParam("safen_no", req.getSafeNo())
                 .build()
                 .toUri();
 
         // HTTP 호출 및 JSON 응답 받기
-        ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+        ResponseEntity<String> response = getStringResponseEntity(uri);
         String jsonResponse = response.getBody();
         JsonNode jsonNode = convertStringToJsonNode(jsonResponse);
         checkResponseCorrect(jsonNode, uri, null);
@@ -145,6 +162,23 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
         return SafeNoProperties.ProviderEnum.SKT;
     }
 
+    @Override
+    public Map<String, Object> makeRequestParam(SafeNoClientReq req) {
+        HashMap<String, Object> requestParams = new HashMap<>();
+        if(req.getOthers().get("qry_flag") != null) requestParams.put("qry_flag", req.getOthers().get("qry_flag"));
+        return requestParams;
+    }
+
+    @Override
+    public Map<String, Object> makeHeader(SafeNoClientReq req) {
+        return Map.of();
+    }
+
+    @Override
+    public Map<String, Object> makeBody(SafeNoClientReq req) {
+        return Map.of();
+    }
+
     private void checkResponseCorrect(JsonNode jsonNode, URI uri, HttpEntity<String> httpEntity) {
         String result = jsonNode.get("result").asText();
 
@@ -152,10 +186,10 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
         if (!result.equalsIgnoreCase("0000")) {
             log.error("skt safeno error occur.\n uri: {} \n request: {}\n response: {}", uri, httpEntity, jsonNode.toPrettyString());
 
-            SKTSafenoError.SKTSafenoErrorCode errorCode = SKTSafenoError.SKTSafenoErrorCode.fromCode(result);
+            SKTSafeNoError.SKTSafeNoErrorCode errorCode = SKTSafeNoError.SKTSafeNoErrorCode.fromCode(result);
 
             // 적절한 에러 메시지를 던짐
-            throw new SKTSafenoError(errorCode.getMean(), errorCode);
+            throw new SKTSafeNoError(errorCode.getMean(), errorCode);
         }
     }
 
@@ -163,8 +197,8 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
     private SafeNoClientRes parseJsonToSafenoClientRes(JsonNode jsonNode) {
 
         // 기본 필드 매핑
-        String telNo = jsonNode.get("tel_no")!=null? jsonNode.get("tel_no").asText() : null;
-        String safeNo = jsonNode.get("safen_no")!=null? jsonNode.get("safen_no").asText() : null;
+        String telNo = jsonNode.get("tel_no") != null ? jsonNode.get("tel_no").asText() : null;
+        String safeNo = jsonNode.get("safen_no") != null ? jsonNode.get("safen_no").asText() : null;
 
         // 나머지 값들을 others에 추가
         Map<String, Object> others = objectMapper.convertValue(jsonNode, Map.class);
@@ -176,4 +210,5 @@ public class SKTSafeNoClient implements SafeNoClient, RestClientRequestMapper {
                 .others(others)
                 .build();
     }
+
 }

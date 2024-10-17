@@ -1,5 +1,6 @@
 package com.autocrypt.safe_no.safe_no.entity;
 
+import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,10 @@ public class DriveEntity extends AuditMetadata {
     @Builder.Default
     private List<PassengerEntity> passengerEntities = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "service_enum")
+    private SafeNoProperties.ServiceEnum serviceEnum;
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
@@ -30,7 +35,7 @@ public class DriveEntity extends AuditMetadata {
                 "updatedAt = " + getUpdatedAt() + ")";
     }
 
-    public PassengerEntity addBoarder(String telNo){
+    public PassengerEntity addPassenger(String telNo){
         PassengerEntity newPassenger = PassengerEntity.builder().telNo(telNo).driveEntity(this).build();
         this.passengerEntities.add(newPassenger);
 

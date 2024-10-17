@@ -1,5 +1,6 @@
 package com.autocrypt.safe_no.safe_no.api_client;
 
+import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientReq;
 import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientRes;
 import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
 
@@ -7,28 +8,20 @@ import java.util.Map;
 
 public interface SafeNoClient {
 
-    // Create (생성) 메서드
-    SafeNoClientRes createSafeNo(String telNo,
-                                 Map<String, Object> requestParams,
-                                 Map<String, Object> body,
-                                 Map<String, Object> headers);
+    // 외부에서 호출 가능한 템플릿 메서드들
+    SafeNoClientRes createSafeNo(SafeNoClientReq req);
 
-    // Read (조회) 메서드
-    SafeNoClientRes readSafeNo(String safeNo,
-                               Map<String, Object> requestParams,
-                               Map<String, Object> headers);
+    SafeNoClientRes readSafeNo(SafeNoClientReq req);
 
-    // Update (수정) 메서드
-    SafeNoClientRes updateSafeNo(String telNo,
-                                 Map<String, Object> requestParams,
-                                 Map<String, Object> body,
-                                 Map<String, Object> headers);
+    SafeNoClientRes updateSafeNo(SafeNoClientReq req);
 
-    // Delete (삭제) 메서드
-    SafeNoClientRes deleteSafeNo(String safeNo,
-                                 Map<String, Object> requestParams,
-                                 Map<String, Object> headers);
+    SafeNoClientRes deleteSafeNo(SafeNoClientReq req);
 
-    // 각 클라이언트가 자신에 맞는 ProviderEnum을 반환하도록 하는 메서드
+    // 전략 패턴을 위한 추상 메서드들 (각 클라이언트가 구현)
+    Map<String, Object> makeRequestParam(SafeNoClientReq req);
+    Map<String, Object> makeHeader(SafeNoClientReq req);
+    Map<String, Object> makeBody(SafeNoClientReq req);
+
+    // 각 클라이언트가 자신에 맞는 ProviderEnum을 반환
     SafeNoProperties.ProviderEnum getProvider();
 }

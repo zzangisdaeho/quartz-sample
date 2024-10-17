@@ -4,23 +4,23 @@ import com.autocrypt.safe_no.safe_no.config.exception.CustomException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-public class SKTSafenoError extends CustomException {
+public class SKTSafeNoError extends CustomException {
 
-    private final SKTSafenoErrorCode errorCode;
+    private final SKTSafeNoErrorCode errorCode;
 
-    public SKTSafenoError(String message, SKTSafenoErrorCode errorCode) {
+    public SKTSafeNoError(String message, SKTSafeNoErrorCode errorCode) {
         super(message);
         this.errorCode = errorCode;
     }
 
-    public SKTSafenoError(String message, HttpStatus httpStatus, SKTSafenoErrorCode errorCode) {
+    public SKTSafeNoError(String message, HttpStatus httpStatus, SKTSafeNoErrorCode errorCode) {
         super(message, httpStatus);
         this.errorCode = errorCode;
     }
 
     // Error code enum 정의
     @Getter
-    public enum SKTSafenoErrorCode {
+    public enum SKTSafeNoErrorCode {
         E101("필수값 누락"),
         E102("System 장애"),
         E201("비회원 제휴사 코드가 아님"),
@@ -33,16 +33,18 @@ public class SKTSafenoError extends CustomException {
         E501("요청한 Data가 이미 삭제됨"),
         E502("요청한 Data가 비정상 상태임"),
         E503("금액 처리 오류"),
-        UNKNOWN("Unknown Error Code");
+        UNKNOWN("Unknown Error Code"),
+        CLIENT_ERROR("client side error"),
+        SKT_SERVER_ERROR("skt server side error");
 
         private final String mean;
 
-        SKTSafenoErrorCode(String mean) {
+        SKTSafeNoErrorCode(String mean) {
             this.mean = mean;
         }
 
-        public static SKTSafenoErrorCode fromCode(String code) {
-            for (SKTSafenoErrorCode errorCode : values()) {
+        public static SKTSafeNoErrorCode fromCode(String code) {
+            for (SKTSafeNoErrorCode errorCode : values()) {
                 if (errorCode.name().equals(code)) {
                     return errorCode;
                 }

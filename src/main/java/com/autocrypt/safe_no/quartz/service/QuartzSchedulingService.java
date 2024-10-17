@@ -101,7 +101,6 @@ public class QuartzSchedulingService {
     }
 
     // 6. 스케줄 조회 (Read)
-    @CheckQuartzJobNotExist
     public JobDetail getJobDetail(String jobName, String jobGroup) throws SchedulerException {
         JobKey jobKey = new JobKey(jobName, jobGroup);
         return scheduler.getJobDetail(jobKey);

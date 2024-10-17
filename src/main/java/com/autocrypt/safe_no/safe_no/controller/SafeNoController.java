@@ -1,12 +1,10 @@
 package com.autocrypt.safe_no.safe_no.controller;
 
+import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
 import com.autocrypt.safe_no.safe_no.controller.dto.req.CreateSafeNoReq;
-import com.autocrypt.safe_no.safe_no.controller.dto.req.DeleteSafeNoReq;
-import com.autocrypt.safe_no.safe_no.controller.dto.req.UpdateExpiredDateReq;
+import com.autocrypt.safe_no.safe_no.controller.dto.req.FinishDriveReq;
 import com.autocrypt.safe_no.safe_no.controller.dto.res.CreateSafeNoRes;
-import com.autocrypt.safe_no.safe_no.controller.dto.res.DeleteSafeNoRes;
 import com.autocrypt.safe_no.safe_no.controller.dto.res.GetSafeNoRes;
-import com.autocrypt.safe_no.safe_no.controller.dto.res.UpdateExpiredDateRes;
 import com.autocrypt.safe_no.safe_no.service.SafeNoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import java.beans.PropertyEditorSupport;
 
 @RestController
-@RequestMapping("/backend/v1")
+@RequestMapping("/backend/v1/drives")
 @RequiredArgsConstructor
 public class SafeNoController {
 
@@ -39,30 +37,25 @@ public class SafeNoController {
     public ResponseEntity<CreateSafeNoRes> createSafeNo(
         @PathVariable("bookingId") String bookingId,
         @RequestBody @Validated CreateSafeNoReq req) {
+
         CreateSafeNoRes response = safeNoService.createSafeNo(bookingId, req);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{telNo}")
+    @GetMapping("/{bookingId}/passengers/{telNo}")
     public ResponseEntity<GetSafeNoRes> getSafeNo(
+        @PathVariable("bookingId") String bookingId,
         @PathVariable("telNo") String telNo,
-        @RequestParam("bookingId") String bookingId) {
-//        GetSafeNoRes response = safeNoService.getSafeNo(telNo, bookingId);
+        @RequestParam("serviceId") SafeNoProperties.ServiceEnum serviceId) {
+        GetSafeNoRes response = safeNoService.getSafeNo(bookingId, telNo, serviceId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{bookingId}/finish")
+    public ResponseEntity<Object> finishDriving(
+            @PathVariable("bookingId") String bookingId) {
+        safeNoService.updateSafeNoDeleteTime(bookingId);
         return ResponseEntity.ok(null);
     }
 
-    @DeleteMapping("/{telNo}")
-    public ResponseEntity<DeleteSafeNoRes> deleteSafeNoList(
-        @PathVariable("telNo") String telNo,
-        @RequestBody DeleteSafeNoReq req) {
-//        DeleteSafeNoRes response = safeNoService.deleteSafeNo(telNo, req);
-        return ResponseEntity.ok(null);
-    }
-
-    @PutMapping("/expired-date")
-    public ResponseEntity<UpdateExpiredDateRes> updateExpiredDate(
-        @RequestBody UpdateExpiredDateReq req) {
-//        UpdateExpiredDateRes response = safeNoService.updateExpiredDate(req);
-        return ResponseEntity.ok(null);
-    }
 }

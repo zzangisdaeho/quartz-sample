@@ -1,5 +1,9 @@
 quartz:
   enabled: true
+  service:
+    safe-no:
+      job-name-prefix: "safe-no-delete:"
+      job-group-prefix: safe-no-delete
 
 spring:
   #https://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/ConfigJDBCJobStoreClustering.html

@@ -2,6 +2,8 @@ package com.autocrypt.safe_no.quartz.service;
 
 import com.autocrypt.logtracer.trace.annotation.LogTrace;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +13,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,7 +38,7 @@ public class QuartzSchedulingEventListener {
     // 1. CREATE 이벤트 처리 (Cron & Simple)
     @Async
     @EventListener
-    public CompletableFuture<ZonedDateTime> handleCreateEvent(QuartzJobCreateEvent event) {
+    public CompletableFuture<ZonedDateTime> handleCreateEvent(@Validated QuartzJobCreateEvent event) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Date startTime;
@@ -71,7 +75,7 @@ public class QuartzSchedulingEventListener {
     // 2. UPDATE 이벤트 처리 (Cron & Simple)
     @Async
     @EventListener
-    public CompletableFuture<ZonedDateTime> handleUpdateEvent(QuartzJobUpdateEvent event) {
+    public CompletableFuture<ZonedDateTime> handleUpdateEvent(@Validated QuartzJobUpdateEvent event) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Date startTime;
@@ -104,7 +108,7 @@ public class QuartzSchedulingEventListener {
     // 3. DELETE 이벤트 처리
     @Async
     @EventListener
-    public CompletableFuture<Boolean> handleDeleteEvent(QuartzJobDeleteEvent event) {
+    public CompletableFuture<Boolean> handleDeleteEvent(@Validated QuartzJobDeleteEvent event) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 boolean deleted = quartzSchedulingService.deleteJob(event.getJobName(), event.getJobGroup());
@@ -126,7 +130,7 @@ public class QuartzSchedulingEventListener {
     // 4. READ 이벤트 처리
     @Async
     @EventListener
-    public CompletableFuture<JobReadResult> handleReadEvent(QuartzJobReadEvent event) {
+    public CompletableFuture<JobReadResult> handleReadEvent(@Validated QuartzJobReadEvent event) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 JobDetail jobDetail = quartzSchedulingService.getJobDetail(event.getJobName(), event.getJobGroup());
@@ -146,7 +150,12 @@ public class QuartzSchedulingEventListener {
     @SuperBuilder
     @AllArgsConstructor
     public static abstract class QuartzJobEvent {
+        @NotNull
+        @NotEmpty
         protected String jobName;
+
+        @NotNull
+        @NotEmpty
         protected String jobGroup;
 
         // 공통 메서드 - cronExpression과 startAt을 인자로 받음
@@ -170,12 +179,15 @@ public class QuartzSchedulingEventListener {
     @Data
     @ToString
     public static class QuartzJobCreateEvent extends QuartzJobEvent {
-        private Class<?> jobClass;
+        @NotNull
+        private Class<? extends Job> jobClass;
+        @NotNull
         @Builder.Default
         private ZonedDateTime startAt = ZonedDateTime.now();
         @Nullable
         private String cronExpression;  // CRON Job일 경우 사용, Simple Job은 null 가능
-        private Map<String, Object> jobParams;
+        @Builder.Default
+        private Map<String, Object> jobParams = new HashMap<>();
 
         public void checkCronExpression() {
             super.checkCronExpression(this.cronExpression, this.startAt);
@@ -189,6 +201,8 @@ public class QuartzSchedulingEventListener {
     public static class QuartzJobUpdateEvent extends QuartzJobEvent {
         @Builder.Default
         private ZonedDateTime newStartAt = ZonedDateTime.now();
+
+        @Nullable
         private String newCronExpression; // CRON Job일 경우 사용
 
         public void checkCronExpression() {

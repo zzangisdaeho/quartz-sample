@@ -27,13 +27,13 @@ class DriveEntityRepositoryTest {
                 .build();
 
         PassengerEntity passengerEntity = PassengerEntity.builder()
-                .telno("01051011900")
+                .telNo("01051011900")
                 .driveEntity(driveEntity)
                 .build();
 
         SafeNoEntity safenoEntity = SafeNoEntity.builder()
                 .passengerEntity(passengerEntity)
-                .safeno("05012345678")
+                .safeNo("05012345678")
                 .providerEnum(SafeNoProperties.ProviderEnum.SKT)
                 .build();
 

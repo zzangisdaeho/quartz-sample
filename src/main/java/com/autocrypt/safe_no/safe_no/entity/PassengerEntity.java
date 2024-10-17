@@ -1,5 +1,6 @@
 package com.autocrypt.safe_no.safe_no.entity;
 
+import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,9 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @Entity
-@Table(name = "boarder_entity",
+@Table(name = "passenger_entity",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uc_passenger_entity_tel_no_drive_id", columnNames = {"tel_no", "drive_id"})
         }
@@ -42,6 +42,16 @@ public class PassengerEntity extends AuditMetadata {
                 "driveEntity = " + getDriveEntity() + ", " +
                 "createdAt = " + getCreatedAt() + ", " +
                 "updatedAt = " + getUpdatedAt() + ")";
+    }
+
+    public SafeNoEntity addSafeNo(String safeNo) {
+        SafeNoEntity newSafeNo = SafeNoEntity.builder()
+                .safeNo(safeNo)
+                .passengerEntity(this)
+                .build();
+        this.safeNoEntities.add(newSafeNo);
+
+        return newSafeNo;
     }
 
 

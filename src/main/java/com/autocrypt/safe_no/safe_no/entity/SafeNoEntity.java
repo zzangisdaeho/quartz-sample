@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "safe_no_entity")
 @Builder
@@ -27,17 +26,12 @@ public class SafeNoEntity extends AuditMetadata {
     @Column(name = "safe_no")
     private String safeNo;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "provider_enum")
-    private SafeNoProperties.ProviderEnum providerEnum;
-
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
                 "safeNoId = " + getSafeNoId() + ", " +
                 "passengerEntity = " + getPassengerEntity() + ", " +
                 "safeNo = " + getSafeNo() + ", " +
-                "providerEnum = " + getProviderEnum() + ", " +
                 "createdAt = " + getCreatedAt() + ", " +
                 "updatedAt = " + getUpdatedAt() + ")";
     }

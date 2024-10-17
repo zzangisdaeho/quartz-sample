@@ -7,6 +7,7 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Map;
 @TestPropertySource(properties = {
         "quartz.enabled=true"
 })
+@ActiveProfiles("test")
 class QuartzSchedulingServiceTest {
 
     @Autowired

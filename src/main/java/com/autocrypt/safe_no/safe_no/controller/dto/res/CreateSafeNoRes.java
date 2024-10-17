@@ -7,9 +7,5 @@ import lombok.Data;
 @Builder
 public class CreateSafeNoRes {
 
-    private String result;
-    private String mobileNo;
     private String safeNo;
-    private String newFlag;
-
 }

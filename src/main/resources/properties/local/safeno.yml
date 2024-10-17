@@ -3,7 +3,7 @@ safe-no:
   provider:
     skt:
       domain: https://safen.skbroadband.com:36361
-      delete-time: 3d
+      delete-time: 30s
       details:
         group-code: autocrypt
         customer-code: 1308
