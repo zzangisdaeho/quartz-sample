@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,22 +26,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component("sktSafeNoClient")
-@LogTrace
 @Slf4j
+@LogTrace
 public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientRequestMapper {
 
 
     private final RestTemplate restTemplate;
-    private final SafeNoProperties safeNoProperties;
-
-    private final SafeNoProperties.ProviderEnum providerEnum = SafeNoProperties.ProviderEnum.SKT;
     private final SafeNoProperties.Provider provider;
     private final ObjectMapper objectMapper;
 
     public SKTSafeNoClient(RestTemplate restTemplate, SafeNoProperties safeNoProperties, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
-        this.safeNoProperties = safeNoProperties;
-        this.provider = safeNoProperties.getProvider().get(providerEnum);
+        this.provider = safeNoProperties.getProvider().get(SafeNoProperties.ProviderEnum.SKT);
         this.objectMapper = objectMapper;
     }
 
@@ -50,8 +47,6 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
                                                 Map<String, Object> body,
                                                 Map<String, Object> headers) {
 
-        if (requestParams == null) requestParams = Collections.EMPTY_MAP;
-
         // 기본 URL
         String baseUrl = provider.getDomain()
                 + "/skt_safen/safen/MappingAdd";
@@ -60,7 +55,7 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
         URI uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("group_code", provider.getDetails().getOrDefault("group-code", "autocrypt"))
                 .queryParam("customer_code", provider.getDetails().getOrDefault("customer-code", "1308"))
-                .queryParam("send_date", TimeUtil.formatZonedDateTime(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
+                .queryParam("send_date", TimeUtil.formatZonedDateTimeForSKT(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
                 .queryParam("tel_no", req.getTelNo())
                 .queryParam("new_flag", requestParams.getOrDefault("new_flag", "Y"))
                 .build()
@@ -80,15 +75,15 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
     private ResponseEntity<String> getStringResponseEntity(URI uri) {
         ResponseEntity<String> response;
         try{
-            log.debug("[{}]skt request: {}", ThreadLocalLogTrace.traceIdHolder.get().getId(), uri.toString());
+            log.debug("[{}]skt request: {}", ThreadLocalLogTrace.currentId(), uri.toString());
             response = restTemplate.getForEntity(uri, String.class);
-            log.debug("[{}]skt response: {}", ThreadLocalLogTrace.traceIdHolder.get().getId(), response.getBody());
+            log.debug("[{}]skt response: {}", ThreadLocalLogTrace.currentId(), response.getBody());
         }catch (HttpClientErrorException e){
             log.error("skt safeNo create fail by 400 status. {} ", e.getMessage(), e);
-            throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR.getMean(), SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR);
+            throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR.getMean(), HttpStatus.INTERNAL_SERVER_ERROR, SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR);
         }catch (HttpServerErrorException e){
             log.error("skt safeNo create fail by 500 status. {} ", e.getMessage(), e);
-            throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR.getMean(), SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR);
+            throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR.getMean(), HttpStatus.INTERNAL_SERVER_ERROR, SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR);
         }
         return response;
     }
@@ -106,7 +101,7 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
         URI uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("group_code", provider.getDetails().getOrDefault("group-code", "autocrypt"))
                 .queryParam("customer_code", provider.getDetails().getOrDefault("customer-code", "1308"))
-                .queryParam("send_date", TimeUtil.formatZonedDateTime(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
+                .queryParam("send_date", TimeUtil.formatZonedDateTimeForSKT(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
                 .queryParam("qry_no", req.getSafeNo())
                 .queryParam("qry_flag", requestParams.getOrDefault("qry_flag", "S"))
                 .build()
@@ -145,7 +140,7 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
         URI uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("group_code", provider.getDetails().getOrDefault("group-code", "autocrypt"))
                 .queryParam("customer_code", provider.getDetails().getOrDefault("customer-code", "1308"))
-                .queryParam("send_date", TimeUtil.formatZonedDateTime(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
+                .queryParam("send_date", TimeUtil.formatZonedDateTimeForSKT(TimeUtil.switchZoneToKorea(ZonedDateTime.now())))
                 .queryParam("safen_no", req.getSafeNo())
                 .build()
                 .toUri();
@@ -193,7 +188,7 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
             SKTSafeNoError.SKTSafeNoErrorCode errorCode = SKTSafeNoError.SKTSafeNoErrorCode.fromCode(result);
 
             // 적절한 에러 메시지를 던짐
-            throw new SKTSafeNoError(errorCode.getMean(), errorCode);
+            throw new SKTSafeNoError(errorCode.getMean(), HttpStatus.INTERNAL_SERVER_ERROR, errorCode);
         }
     }
 

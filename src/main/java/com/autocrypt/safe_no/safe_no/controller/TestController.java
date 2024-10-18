@@ -38,61 +38,61 @@ public class TestController {
         System.out.println(safenoProperties.toString());
     }
 
-    @GetMapping("/test")
-    @Transactional
-    public void test() {
-        System.out.println(safenoProperties.toString());
-
-
-        DriveEntity driveEntity = DriveEntity.builder()
-                .driveId(UUID.randomUUID().toString())
-                .serviceEnum(SafeNoProperties.ServiceEnum.KCALL)
-                .build();
-
-        PassengerEntity passengerEntity = PassengerEntity.builder()
-                .telNo("01051011900")
-                .driveEntity(driveEntity)
-                .build();
-
-        SafeNoEntity safeNoEntity1 = SafeNoEntity.builder()
-                .passengerEntity(passengerEntity)
-                .safeNo("05012345678")
-                .build();
-
-        SafeNoEntity safeNoEntity2 = SafeNoEntity.builder()
-                .passengerEntity(passengerEntity)
-                .safeNo("05012345679")
-                .build();
-
-        driveEntity.getPassengerEntities().add(passengerEntity);
-        passengerEntity.getSafeNoEntities().add(safeNoEntity1);
-        passengerEntity.getSafeNoEntities().add(safeNoEntity2);
-
-
-        DriveEntity save = driveEntityRepository.save(driveEntity);
-
-        System.out.println("save = " + save);
-    }
-
-    @GetMapping("/test/{id}")
-    @Transactional
-    public void test2(@PathVariable String id){
-        Optional<DriveEntity> byId = driveEntityRepository.findById(id);
-        System.out.println("byId = " + byId);
-    }
-
-    @GetMapping("/event")
-    @Transactional
-    public String testEvent() {
-        applicationEventPublisher.publishEvent(
-                QuartzSchedulingEventListener.QuartzJobCreateEvent.builder()
-                        .startAt(ZonedDateTime.now().plusSeconds(10))
-                        .jobName("testJob1")
-                        .jobGroup("testGroup")
-                        .jobClass(SampleSimpleJob.class)
-                        .build()
-
-        );
-        return "갔니?";
-    }
+//    @GetMapping("/test")
+//    @Transactional
+//    public void test() {
+//        System.out.println(safenoProperties.toString());
+//
+//
+//        DriveEntity driveEntity = DriveEntity.builder()
+//                .driveId(UUID.randomUUID().toString())
+////                .serviceEnum(SafeNoProperties.ServiceEnum.KCALL)
+//                .build();
+//
+//        PassengerEntity passengerEntity = PassengerEntity.builder()
+//                .telNo("01051011900")
+//                .driveEntity(driveEntity)
+//                .build();
+//
+//        SafeNoEntity safeNoEntity1 = SafeNoEntity.builder()
+//                .passengerEntity(passengerEntity)
+//                .safeNo("05012345678")
+//                .build();
+//
+//        SafeNoEntity safeNoEntity2 = SafeNoEntity.builder()
+//                .passengerEntity(passengerEntity)
+//                .safeNo("05012345679")
+//                .build();
+//
+//        driveEntity.getPassengerEntities().add(passengerEntity);
+//        passengerEntity.getSafeNoEntities().add(safeNoEntity1);
+//        passengerEntity.getSafeNoEntities().add(safeNoEntity2);
+//
+//
+//        DriveEntity save = driveEntityRepository.save(driveEntity);
+//
+//        System.out.println("save = " + save);
+//    }
+//
+//    @GetMapping("/test/{id}")
+//    @Transactional
+//    public void test2(@PathVariable String id){
+//        Optional<DriveEntity> byId = driveEntityRepository.findById(id);
+//        System.out.println("byId = " + byId);
+//    }
+//
+//    @GetMapping("/event")
+//    @Transactional
+//    public String testEvent() {
+//        applicationEventPublisher.publishEvent(
+//                QuartzSchedulingEventListener.QuartzJobCreateEvent.builder()
+//                        .startAt(ZonedDateTime.now().plusSeconds(10))
+//                        .jobName("testJob1")
+//                        .jobGroup("testGroup")
+//                        .jobClass(SampleSimpleJob.class)
+//                        .build()
+//
+//        );
+//        return "갔니?";
+//    }
 }

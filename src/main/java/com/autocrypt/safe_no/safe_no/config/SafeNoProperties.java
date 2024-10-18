@@ -52,7 +52,7 @@ public class SafeNoProperties {
     }
 
     public enum ProviderEnum {
-        SKT, KT, LG
+        SKT, KT, LG, SEJONG
     }
 
     public enum ServiceEnum {

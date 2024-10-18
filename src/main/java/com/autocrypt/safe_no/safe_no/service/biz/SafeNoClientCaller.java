@@ -21,17 +21,18 @@ public class SafeNoClientCaller {
     public SafeNoClientRes createSafeNo(SafeNoProperties.ServiceEnum serviceId, String telNo) {
         SafeNoClient safenoClient = safeNoClientMap.get(SafeNoUtil.getProviderEnum(serviceId));
         //safeNo 생성
-        return safenoClient.createSafeNo(SafeNoClientReq.builder().telNo(telNo).build());
+        return safenoClient.createSafeNo(SafeNoClientReq.builder().telNo(telNo).serviceId(serviceId).build());
     }
 
     public SafeNoClientRes findSafeNo(SafeNoProperties.ServiceEnum serviceId, String safeNo){
         SafeNoClient safenoClient = safeNoClientMap.get(SafeNoUtil.getProviderEnum(serviceId));
         //safeNo 조회
-        return safenoClient.readSafeNo(SafeNoClientReq.builder().telNo(safeNo).build());
+        return safenoClient.readSafeNo(SafeNoClientReq.builder().safeNo(safeNo).serviceId(serviceId).build());
     }
 
     public SafeNoClientRes releaseSafeNo(String safeNo, SafeNoProperties.ServiceEnum serviceId) {
         SafeNoClient safenoClient = safeNoClientMap.get(SafeNoUtil.getProviderEnum(serviceId));
-        return safenoClient.deleteSafeNo(SafeNoClientReq.builder().safeNo(safeNo).build());
+        //safeNo 매핑 해제
+        return safenoClient.deleteSafeNo(SafeNoClientReq.builder().safeNo(safeNo).serviceId(serviceId).build());
     }
 }

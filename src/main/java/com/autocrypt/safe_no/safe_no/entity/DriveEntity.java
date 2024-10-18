@@ -9,7 +9,9 @@ import java.util.List;
 
 @Getter
 @Entity
-@Table(name = "drive_entity")
+@Table(name = "drive_entity"
+//        uniqueConstraints = {@UniqueConstraint(name = "uc_drive_entity_drive_id_service_enum", columnNames = {"drive_id", "service_enum"})}
+)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,9 +25,9 @@ public class DriveEntity extends AuditMetadata {
     @Builder.Default
     private List<PassengerEntity> passengerEntities = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "service_enum")
-    private SafeNoProperties.ServiceEnum serviceEnum;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "service_enum")
+//    private SafeNoProperties.ServiceEnum serviceEnum;
 
     @Override
     public String toString() {
@@ -40,5 +42,12 @@ public class DriveEntity extends AuditMetadata {
         this.passengerEntities.add(newPassenger);
 
         return newPassenger;
+    }
+
+    public List<String> gatherChildSafeNoList() {
+        return this.passengerEntities.stream()
+                .flatMap(passengerEntity -> passengerEntity.getSafeNoEntities().stream())
+                .map(SafeNoEntity::getSafeNo)
+                .toList();
     }
 }

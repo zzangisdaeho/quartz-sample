@@ -1,10 +1,12 @@
 package com.autocrypt.safe_no.safe_no.api_client;
 
+import com.autocrypt.logtracer.trace.annotation.LogTrace;
 import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientReq;
 import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientRes;
 
 import java.util.Map;
 
+@LogTrace
 public abstract class AbstractSafeNoClient implements SafeNoClient {
 
     // 템플릿 메서드 구현 (외부에서 호출 가능)

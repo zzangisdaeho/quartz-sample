@@ -4,6 +4,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    com.autocrypt.safe_no: debug
 
 #logging:
 #  level:

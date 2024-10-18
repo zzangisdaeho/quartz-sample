@@ -5,41 +5,34 @@ import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientRes;
 import com.autocrypt.safe_no.safe_no.api_client.exception.SKTSafeNoError;
 import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
 import org.junit.jupiter.api.*;
-import org.springframework.aop.support.AopUtils;
+import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class SKTSafeNoClientTest {
+class SejongSafeNoClientTest {
 
     @Autowired
-    @Qualifier("sktSafeNoClient")
-    private SafeNoClient sktSafeNoClient;
+    @Qualifier("sejongSafeNoClient")
+    private SafeNoClient sejongSafeNoClient;
 
     private static String createdSafeNo;
-
-    @Test
-    public void test(){
-        Method[] methods = sktSafeNoClient.getClass().getMethods();
-        System.out.println("methods = " + methods);
-    }
 
     @Test
     @DisplayName("안심번호 생성")
     @Order(1)
     public void createTest() {
-        SafeNoClientRes safeNo = sktSafeNoClient.createSafeNo(
+        SafeNoClientRes safeNo = sejongSafeNoClient.createSafeNo(
                 SafeNoClientReq.builder()
                         .telNo("01051011900")
-                        .serviceId(SafeNoProperties.ServiceEnum.KCALL)
+                        .serviceId(SafeNoProperties.ServiceEnum.IMOM)
                         .build()
         );
         System.out.println("safeNo = " + safeNo);
@@ -51,35 +44,26 @@ class SKTSafeNoClientTest {
     @DisplayName("안심번호 조회")
     @Order(2)
     public void readTest() {
-        SafeNoClientRes safenoClientRes = sktSafeNoClient.readSafeNo(
+        SafeNoClientRes safenoClientRes = sejongSafeNoClient.readSafeNo(
                 SafeNoClientReq.builder()
                         .safeNo(createdSafeNo)
-                        .serviceId(SafeNoProperties.ServiceEnum.KCALL)
+//                        .safeNo("050369828709")
+                        .serviceId(SafeNoProperties.ServiceEnum.IMOM)
                         .build());
 
         System.out.println("safenoClientRes = " + safenoClientRes);
-        Assertions.assertNotNull(safenoClientRes.getTelNo());
-
-        //없는 번호로 조회시 에러
-        Assertions.assertThrows(SKTSafeNoError.class, () -> {
-            SafeNoClientRes safeNoClientRes = sktSafeNoClient.readSafeNo(
-                    SafeNoClientReq.builder()
-                            .safeNo(createdSafeNo)
-                            .serviceId(SafeNoProperties.ServiceEnum.KCALL)
-                            .others(Map.of("qry_flag", "C"))
-                            .build());
-        });
+        Assertions.assertTrue(StringUtils.isNotBlank(safenoClientRes.getTelNo()));
     }
 
     @Test
     @DisplayName("안심번호 삭제")
     @Order(3)
     public void deleteTest() {
-        SafeNoClientRes safenoClientRes = sktSafeNoClient.deleteSafeNo(SafeNoClientReq.builder()
+        SafeNoClientRes safenoClientRes = sejongSafeNoClient.deleteSafeNo(SafeNoClientReq.builder()
                 .safeNo(createdSafeNo)
-                .serviceId(SafeNoProperties.ServiceEnum.KCALL)
+                .serviceId(SafeNoProperties.ServiceEnum.IMOM)
                 .build());
         System.out.println("safenoClientRes = " + safenoClientRes);
-        Assertions.assertNotNull(safenoClientRes.getSafeNo());
+        Assertions.assertNotNull(safenoClientRes.getOthers().get("code"));
     }
 }

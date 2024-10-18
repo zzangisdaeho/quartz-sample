@@ -13,6 +13,12 @@ safe-no:
     lg:
       domain: unkown
       delete-time: 5d
+    sejong:
+      domain: https://050api.sejongtelecom.net:8443
+      delete-time: 3d
+      details:
+        authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhdXRvY3J5cHQiLCJpYXQiOjE3MjIzMTk4OTZ9.mkUtL9mfvThMUYCzqRaH0tuenTEpSQgTwr6ejKHGBtJ5YtUSkGG23CV2zO6x02IXEWRh9Hc338A_n5i8qVqW6A
+        channel-id: ""
   service:
     taboso:
       delete-time: 3d
@@ -22,7 +28,7 @@ safe-no:
       provider: kt
     imom:
       delete-time: 3d
-      provider: lg
+      provider: sejong
     kcall:
-      delete-time: 1d
+      delete-time: 1m
       provider: skt

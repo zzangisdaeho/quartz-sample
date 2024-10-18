@@ -14,9 +14,6 @@ public class CreateSafeNoReq {
     @NotEmpty
     private String telNo;
 
-    @NotNull
-    private SafeNoProperties.ServiceEnum serviceId;
-
     public void setTelNo(@NotNull @NotEmpty String telNo) {
         this.telNo = SafeNoUtil.getTelNoNumberOnly(telNo);
     }

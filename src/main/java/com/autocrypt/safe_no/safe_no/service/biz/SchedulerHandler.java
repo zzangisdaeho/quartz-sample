@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -28,55 +29,60 @@ public class SchedulerHandler {
     private String jobGroupPrefix;
 
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    private final QuartzSchedulingService quartzSchedulingService;
+    private final Optional<QuartzSchedulingService> quartzSchedulingService;
 
     public void registerScheduler(String jobId, SafeNoProperties.ServiceEnum serviceId) {
-        try {
-            // Job이 이미 존재하는지 확인
-            JobDetail existingJob = quartzSchedulingService.getJobDetail(jobPrefix+jobId, jobGroupPrefix);
+        if (quartzSchedulingService.isPresent()) {
+            try {
+                JobDetail existingJob = quartzSchedulingService.get().getJobDetail(jobPrefix + jobId, jobGroupPrefix);
 
-            if (existingJob == null) {
-                // Job이 없으면 새로운 Job 등록
-                applicationEventPublisher.publishEvent(
-                        QuartzSchedulingEventListener.QuartzJobCreateEvent.builder()
-                                .startAt(ZonedDateTime.now().plus(SafeNoUtil.getServiceProperty(serviceId).getDeleteTime()))
-                                .jobClass(DeleteSafeNoJob.class)
-                                .jobName(jobPrefix+jobId)
-                                .jobGroup(jobGroupPrefix)
-                                .jobParams(Map.of(SafeNoProperties.ServiceEnum.class.getSimpleName(), serviceId.name(), "driveId", jobId))
-                                .build());
-            } else {
-                log.info("Job [{}] in group [{}] already exists. Skipping registration.", jobPrefix+jobId, jobGroupPrefix);
+                if (existingJob == null) {
+                    applicationEventPublisher.publishEvent(
+                            QuartzSchedulingEventListener.QuartzJobCreateEvent.builder()
+                                    .startAt(ZonedDateTime.now().plus(SafeNoUtil.getServiceProperty(serviceId).getDeleteTime()))
+                                    .jobClass(DeleteSafeNoJob.class)
+                                    .jobName(jobPrefix + jobId)
+                                    .jobGroup(jobGroupPrefix)
+                                    .jobParams(Map.of(
+                                            SafeNoProperties.ServiceEnum.class.getSimpleName(),
+                                            serviceId.name(), "driveId", jobId))
+                                    .build());
+                } else {
+                    log.info("Job [{}] in group [{}] already exists. Skipping registration.", jobPrefix + jobId, jobGroupPrefix);
+                }
+            } catch (SchedulerException e) {
+                log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix + jobId, jobGroupPrefix, e);
             }
-        } catch (SchedulerException e) {
-            log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix+jobId, jobGroupPrefix, e);
+        } else {
+            log.warn("QuartzSchedulingService 빈이 존재하지 않습니다. 스케줄러 작업을 생략합니다.");
         }
     }
 
     public void delaySchedule(String jobId) {
-        try {
-            // Job이 이미 존재하는지 확인
-            JobDetail existingJob = quartzSchedulingService.getJobDetail(jobPrefix+jobId, jobGroupPrefix);
+        if (quartzSchedulingService.isPresent()) {
+            try {
+                JobDetail existingJob = quartzSchedulingService.get().getJobDetail(jobPrefix + jobId, jobGroupPrefix);
 
-            if (existingJob != null) {
-                // Job이 있으면 시간만큼 delay
-                SafeNoProperties.ServiceEnum serviceId = SafeNoProperties.ServiceEnum.from(
-                        existingJob.getJobDataMap().getString(SafeNoProperties.ServiceEnum.class.getSimpleName())
-                );
+                if (existingJob != null) {
+                    SafeNoProperties.ServiceEnum serviceId = SafeNoProperties.ServiceEnum.from(
+                            existingJob.getJobDataMap().getString(SafeNoProperties.ServiceEnum.class.getSimpleName())
+                    );
 
-                applicationEventPublisher.publishEvent(
-                        QuartzSchedulingEventListener.QuartzJobUpdateEvent.builder()
-                                .newStartAt(ZonedDateTime.now().plus(SafeNoUtil.getServiceProperty(serviceId).getDeleteTime()))
-                                .jobName(jobPrefix+jobId)
-                                .jobGroup(jobGroupPrefix)
-                                .build()
-                );
-            } else {
-                log.warn("Job [{}] in group [{}] not exist. Skipping delay.", jobPrefix+jobId, jobGroupPrefix);
+                    applicationEventPublisher.publishEvent(
+                            QuartzSchedulingEventListener.QuartzJobUpdateEvent.builder()
+                                    .newStartAt(ZonedDateTime.now().plus(SafeNoUtil.getServiceProperty(serviceId).getDeleteTime()))
+                                    .jobName(jobPrefix + jobId)
+                                    .jobGroup(jobGroupPrefix)
+                                    .build()
+                    );
+                } else {
+                    log.warn("Job [{}] in group [{}] not exist. Skipping delay.", jobPrefix + jobId, jobGroupPrefix);
+                }
+            } catch (SchedulerException e) {
+                log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix + jobId, jobGroupPrefix, e);
             }
-        } catch (SchedulerException e) {
-            log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix+jobId, jobGroupPrefix, e);
+        } else {
+            log.warn("QuartzSchedulingService 빈이 존재하지 않습니다. 스케줄러 작업을 생략합니다.");
         }
     }
 }

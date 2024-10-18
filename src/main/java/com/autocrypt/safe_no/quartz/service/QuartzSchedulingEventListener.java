@@ -32,16 +32,11 @@ public class QuartzSchedulingEventListener {
 
     private final QuartzSchedulingService quartzSchedulingService;
 
-//    @Value(value = "${test.error:false}")
-//    private boolean testMode;
-
     // 1. CREATE 이벤트 처리 (Cron & Simple)
     @Async
     @EventListener
     public CompletableFuture<ZonedDateTime> handleCreateEvent(@Validated QuartzJobCreateEvent event) {
-        log.debug("eventListener : {} listen event : {}",
-                String.format("%s.%s", this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName())
-                , event);
+        remainDebugLog(event);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Date startTime;
@@ -79,9 +74,7 @@ public class QuartzSchedulingEventListener {
     @Async
     @EventListener
     public CompletableFuture<ZonedDateTime> handleUpdateEvent(@Validated QuartzJobUpdateEvent event) {
-        log.debug("eventListener : {} listen event : {}",
-                String.format("%s.%s", this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName())
-                , event);
+        remainDebugLog(event);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Date startTime;
@@ -115,9 +108,7 @@ public class QuartzSchedulingEventListener {
     @Async
     @EventListener
     public CompletableFuture<Boolean> handleDeleteEvent(@Validated QuartzJobDeleteEvent event) {
-        log.debug("eventListener : {} listen event : {}",
-                String.format("%s.%s", this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName())
-                , event);
+        remainDebugLog(event);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 boolean deleted = quartzSchedulingService.deleteJob(event.getJobName(), event.getJobGroup());
@@ -140,9 +131,7 @@ public class QuartzSchedulingEventListener {
     @Async
     @EventListener
     public CompletableFuture<JobReadResult> handleReadEvent(@Validated QuartzJobReadEvent event) {
-        log.debug("eventListener : {} listen event : {}",
-                String.format("%s.%s", this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName())
-                , event);
+        remainDebugLog(event);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 JobDetail jobDetail = quartzSchedulingService.getJobDetail(event.getJobName(), event.getJobGroup());
@@ -155,6 +144,12 @@ public class QuartzSchedulingEventListener {
             log.error("Error during job read: {}", event.getJobName(), ex);
             return null;
         });
+    }
+
+    private void remainDebugLog(Object event) {
+        log.debug("eventListener : {} listen event : {}",
+                String.format("%s.%s", this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName())
+                , event);
     }
 
     @Data

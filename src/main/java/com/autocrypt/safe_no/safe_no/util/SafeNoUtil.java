@@ -6,8 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 @Component
 public class SafeNoUtil {
+
+    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^01\\d{8,9}$");
 
     private static SafeNoProperties safenoProperties;
 
@@ -17,7 +21,15 @@ public class SafeNoUtil {
 
     // 숫자만 남긴 번호
     public static String getTelNoNumberOnly(String telNo) {
-        return telNo.replaceAll("[^0-9]", "");
+        //숫자를 제외한것을 제거함.
+        String sanitizedTelNo = telNo.replaceAll("\\D", "");
+
+        // 전화번호 형식 검증
+        if (!PHONE_NUMBER_PATTERN.matcher(sanitizedTelNo).matches()) {
+            throw new CustomException("Invalid phone number format : " + telNo, HttpStatus.BAD_REQUEST);
+        }
+
+        return sanitizedTelNo;
     }
 
     public static SafeNoProperties.Provider getSafeNoProviderProperty(SafeNoProperties.ServiceEnum serviceId) {
