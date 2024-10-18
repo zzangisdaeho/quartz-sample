@@ -44,13 +44,13 @@ public class SchedulerHandler {
                                 .jobClass(DeleteSafeNoJob.class)
                                 .jobName(jobPrefix+jobId)
                                 .jobGroup(jobGroupPrefix)
-                                .jobParams(Map.of(SafeNoProperties.ServiceEnum.class.getSimpleName(), serviceId, "driveId", jobId))
+                                .jobParams(Map.of(SafeNoProperties.ServiceEnum.class.getSimpleName(), serviceId.name(), "driveId", jobId))
                                 .build());
             } else {
-                log.info("Job [{}] in group [{}] already exists. Skipping registration.", jobPrefix, jobGroupPrefix);
+                log.info("Job [{}] in group [{}] already exists. Skipping registration.", jobPrefix+jobId, jobGroupPrefix);
             }
         } catch (SchedulerException e) {
-            log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix, jobGroupPrefix, e);
+            log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix+jobId, jobGroupPrefix, e);
         }
     }
 
@@ -61,7 +61,9 @@ public class SchedulerHandler {
 
             if (existingJob != null) {
                 // Job이 있으면 시간만큼 delay
-                SafeNoProperties.ServiceEnum serviceId = (SafeNoProperties.ServiceEnum)existingJob.getJobDataMap().get(SafeNoProperties.ServiceEnum.class.getSimpleName());
+                SafeNoProperties.ServiceEnum serviceId = SafeNoProperties.ServiceEnum.from(
+                        existingJob.getJobDataMap().getString(SafeNoProperties.ServiceEnum.class.getSimpleName())
+                );
 
                 applicationEventPublisher.publishEvent(
                         QuartzSchedulingEventListener.QuartzJobUpdateEvent.builder()
@@ -71,10 +73,10 @@ public class SchedulerHandler {
                                 .build()
                 );
             } else {
-                log.error("Job [{}] in group [{}] not exist. Skipping delay.", jobPrefix, jobGroupPrefix);
+                log.warn("Job [{}] in group [{}] not exist. Skipping delay.", jobPrefix+jobId, jobGroupPrefix);
             }
         } catch (SchedulerException e) {
-            log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix, jobGroupPrefix, e);
+            log.error("Error checking for existing job: [{}] in group [{}]", jobPrefix+jobId, jobGroupPrefix, e);
         }
     }
 }

@@ -24,6 +24,7 @@ class DriveEntityRepositoryTest {
 
         DriveEntity driveEntity = DriveEntity.builder()
                 .driveId(UUID.randomUUID().toString())
+                .serviceEnum(SafeNoProperties.ServiceEnum.KCALL)
                 .build();
 
         PassengerEntity passengerEntity = PassengerEntity.builder()
@@ -34,7 +35,6 @@ class DriveEntityRepositoryTest {
         SafeNoEntity safenoEntity = SafeNoEntity.builder()
                 .passengerEntity(passengerEntity)
                 .safeNo("05012345678")
-                .providerEnum(SafeNoProperties.ProviderEnum.SKT)
                 .build();
 
         driveEntity.getPassengerEntities().add(passengerEntity);

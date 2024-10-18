@@ -46,6 +46,7 @@ public class TestController {
 
         DriveEntity driveEntity = DriveEntity.builder()
                 .driveId(UUID.randomUUID().toString())
+                .serviceEnum(SafeNoProperties.ServiceEnum.KCALL)
                 .build();
 
         PassengerEntity passengerEntity = PassengerEntity.builder()
@@ -56,13 +57,11 @@ public class TestController {
         SafeNoEntity safeNoEntity1 = SafeNoEntity.builder()
                 .passengerEntity(passengerEntity)
                 .safeNo("05012345678")
-                .providerEnum(SafeNoProperties.ProviderEnum.SKT)
                 .build();
 
         SafeNoEntity safeNoEntity2 = SafeNoEntity.builder()
                 .passengerEntity(passengerEntity)
                 .safeNo("05012345679")
-                .providerEnum(SafeNoProperties.ProviderEnum.SKT)
                 .build();
 
         driveEntity.getPassengerEntities().add(passengerEntity);

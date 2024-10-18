@@ -64,8 +64,9 @@ public class DBHandler {
         passengerEntity.addSafeNo(createdSafeNo.getSafeNo());
     }
 
+    @Transactional
     public DriveEntity deleteFinishedDrive(String driveId) {
-        DriveEntity driveEntity = driveEntityRepository.findAllDataByDriveId(driveId).orElseThrow(ExceptionSupplier.driveNotFound(driveId));
+        DriveEntity driveEntity = driveEntityRepository.findById(driveId).orElseThrow(ExceptionSupplier.driveNotFound(driveId));
         driveEntityRepository.delete(driveEntity);
         return driveEntity;
     }

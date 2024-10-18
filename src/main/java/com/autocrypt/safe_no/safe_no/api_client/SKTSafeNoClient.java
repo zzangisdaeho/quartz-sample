@@ -1,6 +1,7 @@
 package com.autocrypt.safe_no.safe_no.api_client;
 
 import com.autocrypt.logtracer.trace.annotation.LogTrace;
+import com.autocrypt.logtracer.trace.logtrace.ThreadLocalLogTrace;
 import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientReq;
 import com.autocrypt.safe_no.safe_no.api_client.dto.SafeNoClientRes;
 import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
@@ -79,7 +80,9 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
     private ResponseEntity<String> getStringResponseEntity(URI uri) {
         ResponseEntity<String> response;
         try{
+            log.debug("[{}]skt request: {}", ThreadLocalLogTrace.traceIdHolder.get().getId(), uri.toString());
             response = restTemplate.getForEntity(uri, String.class);
+            log.debug("[{}]skt response: {}", ThreadLocalLogTrace.traceIdHolder.get().getId(), response.getBody());
         }catch (HttpClientErrorException e){
             log.error("skt safeNo create fail by 400 status. {} ", e.getMessage(), e);
             throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR.getMean(), SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR);
@@ -111,6 +114,7 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
 
         // HTTP 호출 및 JSON 응답 받기
         ResponseEntity<String> response = getStringResponseEntity(uri);
+
         String jsonResponse = response.getBody();
         JsonNode jsonNode = convertStringToJsonNode(jsonResponse);
         checkResponseCorrect(jsonNode, uri, null);

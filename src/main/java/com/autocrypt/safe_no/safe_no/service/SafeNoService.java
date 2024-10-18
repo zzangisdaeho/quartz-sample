@@ -14,7 +14,6 @@ import com.autocrypt.safe_no.safe_no.repository.DriveEntityRepository;
 import com.autocrypt.safe_no.safe_no.service.biz.DBHandler;
 import com.autocrypt.safe_no.safe_no.service.biz.SafeNoClientCaller;
 import com.autocrypt.safe_no.safe_no.service.biz.SchedulerHandler;
-import com.autocrypt.safe_no.safe_no.util.SafeNoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,14 +92,17 @@ public class SafeNoService {
     }
 
     //scheduler에 의해 실행.
-    public void deleteFinishedDrive(String driveId, SafeNoProperties.ServiceEnum serviceId) {
+    @Transactional
+    public void deleteFinishedDrive(String driveId, String serviceId) {
         //1. DB에서 주행이 끝난 데이터 삭제.
         DriveEntity driveEntity = dbHandler.deleteFinishedDrive(driveId);
         //2. drive에 연관된 안심번호를 삭제.
-        List<String> safeNoList = getSafeNoPairs(driveEntity);
+        List<String> safeNoList = gatherDeleteTargetSafeNoList(driveEntity);
+        log.debug("delete targets = size : {}, safeNoList : {}", safeNoList.size(), safeNoList);
         safeNoList.forEach(safeNo -> {
             try{
-                SafeNoClientRes safeNoClientRes = safeNoClientCaller.releaseSafeNo(safeNo, serviceId);
+                SafeNoClientRes safeNoClientRes = safeNoClientCaller.releaseSafeNo(safeNo, SafeNoProperties.ServiceEnum.from(serviceId));
+                log.debug("delte safeNo success. driveId: {}, safeNo : {}",driveId, safeNo);
             }catch (Exception e){
                 log.error("delete safeNo failed. driveId: {}, safeNo : {}",driveId, safeNo, e);
             }
@@ -108,7 +110,7 @@ public class SafeNoService {
 
     }
 
-    public List<String> getSafeNoPairs(DriveEntity driveEntity) {
+    public List<String> gatherDeleteTargetSafeNoList(DriveEntity driveEntity) {
         List<String> safeNosIncludedInDriving = new ArrayList<>();
 
         for (PassengerEntity passenger : driveEntity.getPassengerEntities()) {

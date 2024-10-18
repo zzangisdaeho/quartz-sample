@@ -67,7 +67,7 @@ class QuartzSchedulingServiceTest {
     @Test
     public void deleteSimpleSchedule(){
         try {
-            quartzSchedulingService.deleteJob("sample-simple2", "samples");
+            quartzSchedulingService.deleteJob("safe-no-delete:abc", "safe-no-delete");
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
