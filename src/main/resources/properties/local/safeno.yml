@@ -23,12 +23,16 @@ safe-no:
     taboso:
       delete-time: 3d
       provider: skt
+      cancel-time: 30s
     move-free:
       delete-time: 3d
       provider: kt
+      cancel-time: 30s
     imom:
-      delete-time: 3d
+      delete-time: 30s
       provider: sejong
+      cancel-time: 30s
     kcall:
-      delete-time: 1m
+      delete-time: 30s
       provider: skt
+      cancel-time: 30s

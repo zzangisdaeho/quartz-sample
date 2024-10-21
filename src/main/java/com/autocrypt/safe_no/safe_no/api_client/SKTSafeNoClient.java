@@ -79,10 +79,10 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
             response = restTemplate.getForEntity(uri, String.class);
             log.debug("[{}]skt response: {}", ThreadLocalLogTrace.currentId(), response.getBody());
         }catch (HttpClientErrorException e){
-            log.error("skt safeNo create fail by 400 status. {} ", e.getMessage(), e);
+            log.error("[{}]skt safeNo create fail by 400 status. {} ", ThreadLocalLogTrace.currentId(), e.getMessage(), e);
             throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR.getMean(), HttpStatus.INTERNAL_SERVER_ERROR, SKTSafeNoError.SKTSafeNoErrorCode.CLIENT_ERROR);
         }catch (HttpServerErrorException e){
-            log.error("skt safeNo create fail by 500 status. {} ", e.getMessage(), e);
+            log.error("[{}]skt safeNo create fail by 500 status. {} ", ThreadLocalLogTrace.currentId(), e.getMessage(), e);
             throw new SKTSafeNoError(SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR.getMean(), HttpStatus.INTERNAL_SERVER_ERROR, SKTSafeNoError.SKTSafeNoErrorCode.SKT_SERVER_ERROR);
         }
         return response;
@@ -183,7 +183,7 @@ public class SKTSafeNoClient extends AbstractSafeNoClient implements RestClientR
 
         // 응답이 성공 코드가 아닌 경우 각 코드별로 CustomException을 던짐
         if (!result.equalsIgnoreCase("0000")) {
-            log.error("skt safeno error occur.\n uri: {} \n request: {}\n response: {}", uri, httpEntity, jsonNode.toPrettyString());
+            log.error("[{}]skt safeno error occur.\n uri: {} \n request: {}\n response: {}", ThreadLocalLogTrace.currentId(), uri, httpEntity, jsonNode.toPrettyString());
 
             SKTSafeNoError.SKTSafeNoErrorCode errorCode = SKTSafeNoError.SKTSafeNoErrorCode.fromCode(result);
 

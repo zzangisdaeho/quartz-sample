@@ -4,6 +4,7 @@ import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
 import com.autocrypt.safe_no.safe_no.controller.dto.req.CreateSafeNoReq;
 import com.autocrypt.safe_no.safe_no.controller.dto.res.CreateSafeNoRes;
 import com.autocrypt.safe_no.safe_no.controller.dto.res.GetSafeNoRes;
+import com.autocrypt.safe_no.safe_no.enums.DelayType;
 import com.autocrypt.safe_no.safe_no.service.SafeNoService;
 import com.autocrypt.safe_no.safe_no.util.SafeNoUtil;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,14 @@ public class SafeNoController {
     @PutMapping("/{driveId}/finish")
     public ResponseEntity<Object> finishDriving(
             @PathVariable("driveId") String driveId) {
-        safeNoService.updateSafeNoDeleteTime(driveId);
+        safeNoService.updateSafeNoDeleteTime(driveId, DelayType.FINISH);
+        return ResponseEntity.ok(null);
+    }
+
+    @PutMapping("/{driveId}/cancel")
+    public ResponseEntity<Object> cancelDriving(
+            @PathVariable("driveId") String driveId) {
+        safeNoService.updateSafeNoDeleteTime(driveId, DelayType.CANCEL);
         return ResponseEntity.ok(null);
     }
 

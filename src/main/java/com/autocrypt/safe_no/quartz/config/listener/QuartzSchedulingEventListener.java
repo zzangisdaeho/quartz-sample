@@ -1,6 +1,7 @@
-package com.autocrypt.safe_no.quartz.service;
+package com.autocrypt.safe_no.quartz.config.listener;
 
 import com.autocrypt.logtracer.trace.annotation.LogTrace;
+import com.autocrypt.safe_no.quartz.service.QuartzSchedulingService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

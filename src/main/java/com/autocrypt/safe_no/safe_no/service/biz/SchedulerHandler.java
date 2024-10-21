@@ -1,9 +1,10 @@
 package com.autocrypt.safe_no.safe_no.service.biz;
 
 import com.autocrypt.safe_no.quartz.jobs.DeleteSafeNoJob;
-import com.autocrypt.safe_no.quartz.service.QuartzSchedulingEventListener;
+import com.autocrypt.safe_no.quartz.config.listener.QuartzSchedulingEventListener;
 import com.autocrypt.safe_no.quartz.service.QuartzSchedulingService;
 import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
+import com.autocrypt.safe_no.safe_no.enums.DelayType;
 import com.autocrypt.safe_no.safe_no.util.SafeNoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +60,7 @@ public class SchedulerHandler {
         }
     }
 
-    public void delaySchedule(String jobId) {
+    public void delaySchedule(String jobId, DelayType delayType) {
         if (quartzSchedulingService.isPresent()) {
             try {
                 JobDetail existingJob = quartzSchedulingService.get().getJobDetail(jobPrefix + jobId, jobGroupPrefix);
@@ -67,10 +69,11 @@ public class SchedulerHandler {
                     SafeNoProperties.ServiceEnum serviceId = SafeNoProperties.ServiceEnum.from(
                             existingJob.getJobDataMap().getString(SafeNoProperties.ServiceEnum.class.getSimpleName())
                     );
+                    Duration delayTime = getDelayDuration(delayType, serviceId);
 
                     applicationEventPublisher.publishEvent(
                             QuartzSchedulingEventListener.QuartzJobUpdateEvent.builder()
-                                    .newStartAt(ZonedDateTime.now().plus(SafeNoUtil.getServiceProperty(serviceId).getDeleteTime()))
+                                    .newStartAt(ZonedDateTime.now().plus(delayTime))
                                     .jobName(jobPrefix + jobId)
                                     .jobGroup(jobGroupPrefix)
                                     .build()
@@ -85,4 +88,12 @@ public class SchedulerHandler {
             log.warn("QuartzSchedulingService 빈이 존재하지 않습니다. 스케줄러 작업을 생략합니다.");
         }
     }
+
+    private static Duration getDelayDuration(DelayType delayType, SafeNoProperties.ServiceEnum serviceId) {
+        return delayType == DelayType.FINISH ?
+                SafeNoUtil.getServiceProperty(serviceId).getDeleteTime() :
+                SafeNoUtil.getServiceProperty(serviceId).getCancelTime();
+    }
+
+
 }

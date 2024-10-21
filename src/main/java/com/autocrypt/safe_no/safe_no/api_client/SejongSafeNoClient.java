@@ -132,12 +132,12 @@ public class SejongSafeNoClient extends AbstractSafeNoClient implements RestClie
             response = restTemplate.exchange(uri, httpMethod, httpEntity, String.class);
             log.debug("[{}]sejong response: {}", ThreadLocalLogTrace.currentId(), response.getBody());
         } catch (HttpClientErrorException e) {
-            log.error("sejong safeNo create fail by 400 status. {} ", e.getMessage(), e);
+            log.error("[{}]sejong safeNo create fail by 400 status. {} ",ThreadLocalLogTrace.currentId(), e.getMessage(), e);
             SejongSafeNoError.SejongSafeNoErrorCode code = mappingErrorCode(e);
             if(code == SejongSafeNoError.SejongSafeNoErrorCode.UNKNOWN) code = SejongSafeNoError.SejongSafeNoErrorCode.CLIENT_ERROR;
             throw new SejongSafeNoError(code.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, code);
         } catch (HttpServerErrorException e) {
-            log.error("sejong safeNo create fail by 500 status. {} ", e.getMessage(), e);
+            log.error("[{}]sejong safeNo create fail by 500 status. {} ",ThreadLocalLogTrace.currentId(), e.getMessage(), e);
             SejongSafeNoError.SejongSafeNoErrorCode code = mappingErrorCode(e);
             if(code == SejongSafeNoError.SejongSafeNoErrorCode.UNKNOWN) code = SejongSafeNoError.SejongSafeNoErrorCode.SEJONG_SERVER_ERROR;
             throw new SejongSafeNoError(code.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, code);

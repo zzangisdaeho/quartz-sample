@@ -1,24 +1,14 @@
 package com.autocrypt.safe_no.safe_no.controller;
 
-import com.autocrypt.safe_no.quartz.jobs.SampleSimpleJob;
-import com.autocrypt.safe_no.quartz.service.QuartzSchedulingEventListener;
 import com.autocrypt.safe_no.safe_no.api_client.SafeNoClient;
 import com.autocrypt.safe_no.safe_no.config.SafeNoProperties;
-import com.autocrypt.safe_no.safe_no.entity.PassengerEntity;
-import com.autocrypt.safe_no.safe_no.entity.DriveEntity;
-import com.autocrypt.safe_no.safe_no.entity.SafeNoEntity;
 import com.autocrypt.safe_no.safe_no.repository.DriveEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZonedDateTime;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor

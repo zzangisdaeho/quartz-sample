@@ -11,10 +11,10 @@ public class ExceptionSupplier {
     }
 
     public static Supplier<CustomException> driveNotFound(String driveId){
-        return () -> new CustomException("booking not found " + driveId, HttpStatus.BAD_REQUEST);
+        return () -> new CustomException("drive not found " + driveId, HttpStatus.BAD_REQUEST);
     }
 
     public static Supplier<CustomException> telNoNotFound(String telNo, String driveId){
-        return () -> new CustomException(String.format("telNo %s not found in booking %s", telNo, driveId), HttpStatus.BAD_REQUEST);
+        return () -> new CustomException(String.format("telNo %s not found in drive %s", telNo, driveId), HttpStatus.BAD_REQUEST);
     }
 }

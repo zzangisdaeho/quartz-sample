@@ -44,10 +44,12 @@ public class SafeNoProperties {
     public static class Service {
         private final Duration deleteTime;
         private final ProviderEnum provider;
+        private final Duration cancelTime;
 
-        public Service(Duration deleteTime, ProviderEnum provider) {
+        public Service(Duration deleteTime, ProviderEnum provider, Duration cancelTime) {
             this.deleteTime = deleteTime;
             this.provider = provider;
+            this.cancelTime = cancelTime;
         }
     }
 
