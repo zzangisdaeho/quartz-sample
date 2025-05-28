@@ -1,0 +1,13 @@
+POST http://localhost:10001/api/scheduler/one-time
+Content-Type: application/json
+
+{
+  "jobName": "sampleJob1",
+  "jobGroup": "sampleGroup",
+  "jobClassName": "SampleFailJob",
+  "startAt": "2025-05-21T10:24:00+09:00",
+  "jobParams": {
+    "param1": "value1",
+    "param2": "123"
+  }
+}
